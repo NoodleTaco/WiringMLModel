@@ -108,8 +108,8 @@ public class WireDiagram {
             wireToCut = colorsChosen.get(2);
         }
 
-        System.out.println("isDangerous: " + isDangerous);
-        System.out.println("Wire to Cut: " + wireToCut);
+        //System.out.println("isDangerous: " + isDangerous);
+        //System.out.println("Wire to Cut: " + wireToCut);
 
     }
 
@@ -137,10 +137,24 @@ public class WireDiagram {
         }
     }
 
+    public String encodeDiagram(){
+
+        StringBuilder encodedDiagram = new StringBuilder();
+
+        for (int i = 0; i < WIRE_DIAGRAM_SIZE; i++) {
+            for (int j = 0; j < WIRE_DIAGRAM_SIZE; j++) {
+                encodedDiagram.append(wireDiagram[i][j].getWireColor());
+            }
+        }
+
+        return encodedDiagram.toString();
+    }
+
     public static void main(String[] args) {
         WireDiagram wireDiagram = new WireDiagram();
         wireDiagram.generateDiagram();
         wireDiagram.printDiagram();
+        System.out.println(wireDiagram.encodeDiagram());
     }
 
 
