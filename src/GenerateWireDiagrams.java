@@ -4,8 +4,8 @@ import java.io.IOException;
 
 public class GenerateWireDiagrams {
 
-    public static final String taskOneTrainingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\Data\\SafeOrDangerousTrainingData.txt";
-    public static final String taskOneTestingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\Data\\SafeOrDangerousTestingData.txt";
+    public static final String taskOneTrainingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\SafeOrDangerousTrainingData.txt";
+    public static final String taskOneTestingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\SafeOrDangerousTestingData.txt";
 
     public GenerateWireDiagrams(){
     }
