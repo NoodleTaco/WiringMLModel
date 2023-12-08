@@ -27,16 +27,29 @@ public class matrixManager {
         }
     }
 
-    public static void addArraysAtIndex(int[] array1, int[] array2, int startIndex) {
-        if (startIndex < 0 || startIndex >= array1.length) {
-            System.out.println("Invalid start index. Please provide a valid index.");
+    /**
+     * Prints the contents of a vector.
+     *
+     * @param vector The vector to be printed.
+     */
+    public static void printVector(int[] vector) {
+        for (int value : vector) {
+            System.out.print(value);
+        }
+        System.out.println();
+    }
+
+
+    public static void addArraysAtIndex(int[] arrayToAddTo, int[] arrayToAddFrom, int startIndex) {
+        if (startIndex < 0 || startIndex >= arrayToAddTo.length) {
+            System.out.println("Invalid start index.");
             return;
         }
 
-        int array2Index = 0;
-        for (int i = startIndex; i < array1.length && array2Index < array2.length; i++) {
-            array1[i] += array2[array2Index];
-            array2Index++;
+        int arrayToAddFromIndex = 0;
+        for (int i = startIndex; i < arrayToAddTo.length && arrayToAddFromIndex < arrayToAddFrom.length; i++) {
+            arrayToAddTo[i] += arrayToAddFrom[arrayToAddFromIndex];
+            arrayToAddFromIndex++;
         }
     }
 
