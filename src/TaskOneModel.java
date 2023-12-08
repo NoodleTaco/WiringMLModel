@@ -167,17 +167,20 @@ public class TaskOneModel {
     public void SGD(){
         //First pick a random selection of weights
         Random random = new Random();
+
+        // Generating a random value between -0.1 and 0.1
+        double scaleFactor = 0.2; // Adjust the scale factor based on the desired range
         for (int i = 0; i < weights.length; i++) {
-            double randomValue = -1 + 2 * random.nextDouble(); // Generates a random value between -1 and 1
+            double randomValue = -scaleFactor + 2 * scaleFactor * random.nextDouble();
             weights[i] = randomValue;
         }
 
         //SGD will stop when the gradient of the loss function goes below a certain threshold 
         int iterations = 0;
         while(iterations < MAX_ITERATIONS){
-
+            HashMap<Integer[], Integer> sampleSet = new HashMap<>();
+            
         }
-
 
 
     }   
