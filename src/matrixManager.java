@@ -40,7 +40,7 @@ public class matrixManager {
     }
 
 
-    public static void addArraysAtIndex(int[] arrayToAddTo, int[] arrayToAddFrom, int startIndex) {
+    public static void addArraysAtIndex(Integer[] arrayToAddTo, int[] arrayToAddFrom, int startIndex) {
         if (startIndex < 0 || startIndex >= arrayToAddTo.length) {
             System.out.println("Invalid start index.");
             return;
@@ -48,7 +48,7 @@ public class matrixManager {
 
         int arrayToAddFromIndex = 0;
         for (int i = startIndex; i < arrayToAddTo.length && arrayToAddFromIndex < arrayToAddFrom.length; i++) {
-            arrayToAddTo[i] += arrayToAddFrom[arrayToAddFromIndex];
+            arrayToAddTo[i] = arrayToAddFrom[arrayToAddFromIndex];
             arrayToAddFromIndex++;
         }
     }
