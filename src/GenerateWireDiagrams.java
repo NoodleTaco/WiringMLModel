@@ -10,12 +10,30 @@ public class GenerateWireDiagrams {
     public GenerateWireDiagrams(){
     }
 
-    public void generateWiringData(int numEntries, String filePath){
-        for(int i = 0; i < numEntries; i ++){
+    public void generateSafeDangerousWiringData(int numEntries, String filePath){
+        int numSafe = 0;
+        int numDang = 0;
+
+        while(numSafe + numDang != numEntries){
             WireDiagram wireDiagram = new WireDiagram();
             wireDiagram.generateDiagram();
-            writeDiagramToFile(wireDiagram, filePath);
+
+            if(numSafe < numEntries/2){
+                if(wireDiagram.getIsDangerous() == 0){
+                    writeDiagramToFile(wireDiagram, filePath);
+                    numSafe++;
+                }
+            }
+
+             if(numDang < numEntries/2){
+                if(wireDiagram.getIsDangerous() == 1){
+                    writeDiagramToFile(wireDiagram, filePath);
+                    numDang++;
+                }
+            }
         }
+        System.out.println("numSafe: " + numSafe);
+        System.out.println("numDang: " + numDang);
     }
 
     private void writeDiagramToFile(WireDiagram wireDiagram, String filePath){
@@ -35,7 +53,7 @@ public class GenerateWireDiagrams {
     public static void main (String [] args){
 
         GenerateWireDiagrams generateWireDiagrams = new GenerateWireDiagrams();
-        generateWireDiagrams.generateWiringData(5000, taskOneTestingData);
+        generateWireDiagrams.generateSafeDangerousWiringData(5000, taskOneTrainingData);
     }
 
 

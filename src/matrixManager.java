@@ -17,6 +17,8 @@ public class matrixManager {
         return result;
     }
 
+    
+
     // Helper method to print a matrix
     public static void printMatrix(int[][] matrix) {
         for (int[] row : matrix) {
@@ -38,6 +40,15 @@ public class matrixManager {
         }
         System.out.println();
     }
+
+    public static void printVector(Integer[] vector) {
+        for (int value : vector) {
+            System.out.print(value);
+        }
+        System.out.println();
+    }
+
+    
 
 
     public static void addArraysAtIndex(Integer[] arrayToAddTo, int[] arrayToAddFrom, int startIndex) {
