@@ -14,9 +14,7 @@ public class TaskOneModel {
 
     static final int FEATURE_SPACE_LENGTH = 1601; //400 * (4 + 4! /2)
 
-    static final double GRADIENT_LOSS_THRESHOLD = 0.05; //Determines where SGD can stop once the gradient of its loss goes below this threshold
-
-    static final int MAX_ITERATIONS = 1000; //max number of iterations of SGD in case it dosen't converge
+    static final int NUM_ITERATIONS = 1000;
 
     static final int SGD_SAMPLE_SIZE = 100; //The size of the input set an iteration of SGD uses
 
@@ -187,7 +185,6 @@ public class TaskOneModel {
             }
         }
 
-        //STOP UNDO HERE
 
         featureSpace[0] = 1; //Add baseline feature 
         int addToIndex = 1;
@@ -242,11 +239,10 @@ public class TaskOneModel {
             weights[i] = randomValue;
         }
 
-        
-        //SGD will stop when the gradient of the loss function goes below a certain threshold 
+    
         int iterations = 0;
 
-        while(iterations < MAX_ITERATIONS){
+        while(iterations < NUM_ITERATIONS){
             
             //System.out.println("Training Data Success Rate: " + testSuccessRate(diagramMap));
             //System.out.println("Testing Data Success Rate: " + testSuccessRate(testingInputMap));
@@ -279,8 +275,8 @@ public class TaskOneModel {
 
             
 
-            trainingLossList.add(calculateLoss(diagramMap));
-            testingLossList.add(calculateLoss(testingInputMap));
+            //trainingLossList.add(calculateLoss(diagramMap));
+            //testingLossList.add(calculateLoss(testingInputMap));
 
             trainingAccuracy.add(testSuccessRate(diagramMap));
             testingAccuracy.add(testSuccessRate(testingInputMap));
@@ -305,6 +301,7 @@ public class TaskOneModel {
         for (Map.Entry<Integer[], Integer> entry : inputMap.entrySet()) {
            totalLoss += -((entry.getValue()*Math.log(calculateSigmoid(entry.getKey(), weights))) + ((1 - entry.getValue()) * Math.log(1 - calculateSigmoid(entry.getKey(), weights))));
         }
+        //Add penalizing factor for l2 regression
         double l2RegressionFactor = 0;
         for(double weight: weights){
             l2RegressionFactor += Math.pow(weight, 2);
@@ -315,7 +312,7 @@ public class TaskOneModel {
     }
 
     /**
-     * Calculates thes gradient of the loss over the input 
+     * Calculates the gradient of the loss over the input 
      * Derivative of loss with respect to weight j = -(y - f(x))xj + 2 * lambda * weight j
      * Details in Report
      * @param input Input considered
@@ -323,6 +320,7 @@ public class TaskOneModel {
      */
     private Double[] computeLossGradient(Integer[] input, Integer label) {
         Double[] lossGradient = new Double[input.length];
+        //Calculate once 
         double sigmoidMinusLabel = calculateSigmoid(input, weights) - label;
 
     
@@ -370,7 +368,7 @@ public class TaskOneModel {
      * @param weightVector The weight vector (array of doubles).
      * @return The result of the sigmoid function.
      */
-    public static double calculateSigmoid(Integer[] inputVector, double[] weightVector) {
+public static double calculateSigmoid(Integer[] inputVector, double[] weightVector) {
         if (inputVector.length != weightVector.length) {
             System.out.println("Input vector and weight vector must have the same length.");
             return -1;

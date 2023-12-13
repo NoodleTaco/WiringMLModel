@@ -64,6 +64,20 @@ public class matrixManager {
         }
     }
 
+    public static void addArraysAtIndex(Double[] arrayToAddTo, int[] arrayToAddFrom, int startIndex) {
+        if (startIndex < 0 || startIndex >= arrayToAddTo.length) {
+            System.out.println("Invalid start index.");
+            return;
+        }
+
+        int arrayToAddFromIndex = 0;
+        for (int i = startIndex; i < arrayToAddTo.length && arrayToAddFromIndex < arrayToAddFrom.length; i++) {
+            arrayToAddTo[i] = Double.valueOf(arrayToAddFrom[arrayToAddFromIndex]);
+            arrayToAddFromIndex++;
+        }
+    }
+
+
     public static int[] flattenArray(int[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;

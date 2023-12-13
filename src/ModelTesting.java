@@ -43,6 +43,34 @@ public class ModelTesting {
         new SwingWrapper<>(taskOneModelLossOverIterations).displayChart();
     }
 
+    public void getTaskTwoLossGraph(int numSamples, double alpha, double lambda){
+        TaskTwoModel taskTwoModel = new TaskTwoModel(numSamples, alpha, lambda);
+        taskTwoModel.SGD();
+
+        ArrayList<Integer> iterations = new ArrayList<>();
+
+        for(int i = 0; i < taskTwoModel.getTrainingLossList().size(); i ++){
+            iterations.add(i +1);
+        }
+
+        XYChart taskTwoModelLossOverIterations = new XYChartBuilder()
+        .width(800)
+        .height(600)
+        .title("Loss Over SGD")
+        .xAxisTitle("Number of Iterations of SGD")
+        .yAxisTitle("Loss")
+        .build();
+
+        taskTwoModelLossOverIterations.addSeries("Training Loss", iterations, taskTwoModel.getTrainingLossList());
+        taskTwoModelLossOverIterations.addSeries("Testing Loss", iterations, taskTwoModel.getTestingLossList());
+
+
+        taskTwoModelLossOverIterations.getStyler().setMarkerSize(8);
+        taskTwoModelLossOverIterations.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
+        
+        new SwingWrapper<>(taskTwoModelLossOverIterations).displayChart();
+    }
+
     public void getTaskOneAccuracyGraph(int numSamples, double alpha, double lambda){
         TaskOneModel taskOneModel = new TaskOneModel(numSamples, alpha, lambda);
         taskOneModel.SGD();
@@ -220,12 +248,15 @@ public class ModelTesting {
         ModelTesting modelTesting = new ModelTesting();
         //modelTesting.getTaskOneAccuracyGraph(5000, 0.05, 0.1);
         
-        modelTesting.getTaskOneLossGraph(2000, 0.01, 0.1);
+        //modelTesting.getTaskOneLossGraph(2000, 0.01, 0.1);
         
-        modelTesting.getTaskOneAccuracyGraph(3000, 0.01, 1);
+        //modelTesting.getTaskOneAccuracyGraph(3000, 0.01, 0.1);
+
         //modelTesting.testTaskOneAssignmentThresholds();
 
         //System.out.println("Average: " + modelTesting.getTaskOneAverageSuccessRate(3000, 0.01, 0));
+
+        modelTesting.getTaskTwoLossGraph(2000, 0.01, 0.1);
         
     }
 }
