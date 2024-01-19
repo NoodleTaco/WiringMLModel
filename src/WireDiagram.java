@@ -35,6 +35,9 @@ public class WireDiagram {
         }
     }
 
+    /**
+     * Generates the diagram based on the project description
+     */
     public void generateDiagram() {
         initializeDiagram();
 
@@ -49,50 +52,53 @@ public class WireDiagram {
         for(int i = 0; i < 4; i ++){
             int chosenRowOrCol = random.nextInt(WIRE_DIAGRAM_SIZE);
 
-        if(fillingRow){
-            while (rowsChosen.contains(chosenRowOrCol)) {
-                chosenRowOrCol = random.nextInt(WIRE_DIAGRAM_SIZE);
+            if(fillingRow){
+                while (rowsChosen.contains(chosenRowOrCol)) {
+                    chosenRowOrCol = random.nextInt(WIRE_DIAGRAM_SIZE);
+                }
             }
-        }
-        else{
-            while (colsChosen.contains(chosenRowOrCol)) {
-                chosenRowOrCol = random.nextInt(WIRE_DIAGRAM_SIZE);
+            else{
+                while (colsChosen.contains(chosenRowOrCol)) {
+                    chosenRowOrCol = random.nextInt(WIRE_DIAGRAM_SIZE);
+                }
             }
-        }
 
-        int color = random.nextInt(NUM_WIRES) +1;
+            int color = random.nextInt(NUM_WIRES) +1;
 
-        while(colorsChosen.contains(color)){
-            color = random.nextInt(NUM_WIRES) +1;
-        }
-
-        if(fillingRow){
-            for(int col = 0; col < WIRE_DIAGRAM_SIZE; col ++){
-                wireDiagram[chosenRowOrCol][col].setWireColor(color);
+            while(colorsChosen.contains(color)){
+                color = random.nextInt(NUM_WIRES) +1;
             }
-        }
-        else{
-            for(int row = 0; row < WIRE_DIAGRAM_SIZE; row ++){
-                wireDiagram[row][chosenRowOrCol].setWireColor(color);
+
+            if(fillingRow){
+                for(int col = 0; col < WIRE_DIAGRAM_SIZE; col ++){
+                    wireDiagram[chosenRowOrCol][col].setWireColor(color);
+                }
             }
-        }
+            else{
+                for(int row = 0; row < WIRE_DIAGRAM_SIZE; row ++){
+                    wireDiagram[row][chosenRowOrCol].setWireColor(color);
+                }
+            }
 
-        if(fillingRow){
-            rowsChosen.add(chosenRowOrCol);
-        }
-        else{
-            colsChosen.add(chosenRowOrCol);
-        }
+            if(fillingRow){
+                rowsChosen.add(chosenRowOrCol);
+            }
+            else{
+                colsChosen.add(chosenRowOrCol);
+            }
 
-        colorsChosen.add(color);
+            colorsChosen.add(color);
 
-        fillingRow = !fillingRow;
+            fillingRow = !fillingRow;
         }
 
         setLabels();
 
     }
 
+    /**
+     * Sets the labels of the diagram based on the colorsChosen array
+     */
     private void setLabels(){
         if(colorsChosen.indexOf(Wire.RED_WIRE) < colorsChosen.indexOf(Wire.YELLOW_WIRE)){
             isDangerous = 1;
@@ -108,8 +114,6 @@ public class WireDiagram {
             wireToCut = colorsChosen.get(2);
         }
 
-        //System.out.println("isDangerous: " + isDangerous);
-        //System.out.println("Wire to Cut: " + wireToCut);
 
     }
 
@@ -137,6 +141,10 @@ public class WireDiagram {
         }
     }
 
+    /**
+     * Encodes the diagram by flattening 
+     * @return String representation of the diagram
+     */
     public String encodeDiagram(){
 
         StringBuilder encodedDiagram = new StringBuilder();
@@ -150,6 +158,7 @@ public class WireDiagram {
         return encodedDiagram.toString();
     }
 
+    //Run file to get a visual representation of the wiring diagram
     public static void main(String[] args) {
         WireDiagram wireDiagram = new WireDiagram();
         wireDiagram.generateDiagram();

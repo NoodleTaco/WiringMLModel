@@ -12,13 +12,13 @@ import java.util.Map.Entry;
 
 public class TaskOneModel { 
 
-    static final int FEATURE_SPACE_LENGTH = 1601; //400 * (4 + 4! /2)
+    static final int FEATURE_SPACE_LENGTH = 1613; 
 
     static final int NUM_ITERATIONS = 1000;
 
     static final int SGD_SAMPLE_SIZE = 100; //The size of the input set an iteration of SGD uses
 
-    static final int NUM_TESTING_INPUTS = 100; //Size of the testing set 
+    static final int NUM_TESTING_INPUTS = 1000; //Size of the testing set 
 
     static final double ASSIGNMENT_THRESHOLD = 0.5; //Decision threshold for assigning a label 
 
@@ -68,29 +68,6 @@ public class TaskOneModel {
 
         assignmentThreshold = ASSIGNMENT_THRESHOLD;
     }
-    
-    /**
-     * Constructor with assignmentThreshold specified
-     * @param numSamples
-     * @param alpha
-     * @param lambda
-     * @param assignmentThreshold
-     */
-    public TaskOneModel(int numSamples, double alpha, double lambda, double assignmentThreshold){
-        this.numSamples = numSamples;
-        this.alphha = alpha;
-        this.lambda = lambda;
-        this.assignmentThreshold = assignmentThreshold;
-
-        diagramMap = new HashMap<>();
-
-        testingInputMap = new HashMap<>();
-
-        weights = new double[FEATURE_SPACE_LENGTH];
-
-        trainingLossList = new ArrayList<>();
-        testingLossList = new ArrayList<>();
-    }
 
     public void readTrainingDiagrams() {
         try (BufferedReader reader = new BufferedReader(new FileReader(GenerateWireDiagrams.taskOneTrainingData))) {
@@ -138,85 +115,139 @@ public class TaskOneModel {
             return null;
         }
 
-        //System.out.println(diagram);
+
+        int[][] diagramLiteralMatrix = new int[20][20]; //Representation of matrix without one hot encoding, used for overlap features
+
+
+        int diagramPointer = 0;
+        for(int x = 0; x< 20; x++){
+            for(int y = 0; y < 20; y++){
+                diagramLiteralMatrix[x][y] = Character.getNumericValue(diagram.charAt(diagramPointer));
+                diagramPointer++;
+            }
+        }
+
+
+
 
         Integer[] featureSpace = new Integer[FEATURE_SPACE_LENGTH];
 
-        int[][] redWireMatrix = new int[WireDiagram.WIRE_DIAGRAM_SIZE][WireDiagram.WIRE_DIAGRAM_SIZE];
-        int[][] blueWireMatrix = new int[WireDiagram.WIRE_DIAGRAM_SIZE][WireDiagram.WIRE_DIAGRAM_SIZE];
-        int[][] yellowWireMatrix = new int[WireDiagram.WIRE_DIAGRAM_SIZE][WireDiagram.WIRE_DIAGRAM_SIZE];
-        int[][] greenWireMatrix = new int[WireDiagram.WIRE_DIAGRAM_SIZE][WireDiagram.WIRE_DIAGRAM_SIZE];
-
-        //Construct the matrices for each wire
-        int diagramPointer = 0;
-        for(int x = 0; x < 20; x ++){
-            for(int y = 0; y < 20; y ++){
-                int currentWire = Character.getNumericValue(diagram.charAt(diagramPointer));
-
-                if(currentWire == Wire.RED_WIRE){
-                    redWireMatrix[x][y] = 1;
-                }
-                else{
-                    redWireMatrix[x][y] = 0;
-                }
-
-                if(currentWire == Wire.BLUE_WIRE){
-                    blueWireMatrix[x][y] = 1;
-                }
-                else{
-                    blueWireMatrix[x][y] = 0;
-                }
-
-                if(currentWire == Wire.YELLOW_WIRE){
-                    yellowWireMatrix[x][y] = 1;
-                }
-                else{
-                    yellowWireMatrix[x][y] = 0;
-                }
-
-                if(currentWire == Wire.GREEN_WIRE){
-                    greenWireMatrix[x][y] = 1;
-                }
-                else{
-                    greenWireMatrix[x][y] = 0;
-                }
-
-                diagramPointer ++;
-            }
-        }
+        //Features that represent if a given color overlaps another
+        int[] redOverlaps = {0,0,0}; //Ex: redOverlaps[0] = 1 means the red wire overlaps blue 
+        int[] blueOverlaps = {0,0,0};
+        int[] yellowOverlaps = {0,0,0};
+        int[] greenOverlaps= {0,0,0};
 
 
         featureSpace[0] = 1; //Add baseline feature 
-        int addToIndex = 1;
+        int addToIndex = -3; //Start at -3 so i can increment with addToIndex += 4, -3 + 4 = index 1
 
-        matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(redWireMatrix), addToIndex);
 
-        //matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(blueWireMatrix), addToIndex+=400);
+        for(int i = 0 ; i < diagram.length(); i ++){
+            //Create one hot encoded diagram 
+            int currentWire = Character.getNumericValue(diagram.charAt(i));
+            matrixManager.addArraysAtIndex(featureSpace,Wire.encodeWireColor(currentWire), addToIndex+= 4);
+        }
 
-        matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(yellowWireMatrix),addToIndex+=400);
-
-        //matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(greenWireMatrix), addToIndex+=400);
-        
-        matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(matrixManager.multiplyMatrices(redWireMatrix, yellowWireMatrix)), addToIndex+= 400);
-
-        matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(matrixManager.multiplyMatrices(yellowWireMatrix, redWireMatrix)), addToIndex+= 400);
-
-        /* 
-        ArrayList<int[][]> colorMatrixList = new ArrayList<>();
-
-        colorMatrixList.add(redWireMatrix); colorMatrixList.add(blueWireMatrix); colorMatrixList.add(yellowWireMatrix); colorMatrixList.add(greenWireMatrix);
-
-        for(int[][] matrixOne: colorMatrixList){
-            for(int[][] matrixTwo: colorMatrixList){
-                if(matrixOne != matrixTwo){
-                    matrixManager.addArraysAtIndex(featureSpace, matrixManager.flattenArray(matrixManager.multiplyMatrices(matrixOne, matrixTwo)), addToIndex += 400);
+        //Populate the overlap arrarys 
+        for(int x = 0 ; x < diagramLiteralMatrix.length; x ++){
+            for(int y = 0; y < diagramLiteralMatrix[0].length; y ++){
+                if(diagramLiteralMatrix[x][y] == Wire.RED_WIRE){
+                    int neighborResults = neighborColorChecker(diagramLiteralMatrix, x, y, Wire.RED_WIRE);
+                    if(neighborResults !=0){
+                        redOverlaps[neighborResults - 2] = 1;
+                    }
+                }
+                else if(diagramLiteralMatrix[x][y] == Wire.BLUE_WIRE){
+                    int neighborResults = neighborColorChecker(diagramLiteralMatrix, x, y, Wire.BLUE_WIRE);
+                    if(neighborResults ==1){
+                        blueOverlaps[neighborResults - 1] = 1;
+                    }
+                    else if(neighborResults == 3 || neighborResults == 4){
+                        blueOverlaps[neighborResults - 2] = 1;
+                    }
+                }
+                else if(diagramLiteralMatrix[x][y] == Wire.YELLOW_WIRE){
+                    int neighborResults = neighborColorChecker(diagramLiteralMatrix, x, y, Wire.YELLOW_WIRE);
+                    if(neighborResults == 1 || neighborResults == 2){
+                        yellowOverlaps[neighborResults - 1] = 1;
+                    }
+                    else if(neighborResults == 4){
+                        yellowOverlaps[neighborResults - 2] = 1;
+                    }
+                }
+                else if(diagramLiteralMatrix[x][y] == Wire.GREEN_WIRE){
+                    int neighborResults = neighborColorChecker(diagramLiteralMatrix, x, y, Wire.GREEN_WIRE);
+                    if(neighborResults !=0){
+                        greenOverlaps[neighborResults - 1] = 1;
+                    }
                 }
             }
         }
-        
-        */
+
+
+        //Add the overlap features to the feature space
+
+        matrixManager.addArraysAtIndex(featureSpace, redOverlaps, addToIndex += 4);
+        matrixManager.addArraysAtIndex(featureSpace, blueOverlaps, addToIndex += 3);
+        matrixManager.addArraysAtIndex(featureSpace, yellowOverlaps, addToIndex += 3);
+        matrixManager.addArraysAtIndex(featureSpace, greenOverlaps, addToIndex += 3);
+
+
+
 
         return featureSpace;
+    }
+
+
+    /**
+     * Helper method that indicates if the passed in wire overrlaps another
+     * @param diagram Wire diagram 
+     * @param xCoord x location of the wire in the diagram 
+     * @param yCoord y location of the wire in the diagram
+     * @param wireColor What wire is being passed in
+     * @return
+     */
+    private int neighborColorChecker(int[][] diagram, int xCoord, int yCoord, int wireColor){
+        //Loop through each color
+        for(int color = Wire.RED_WIRE; color <= Wire.GREEN_WIRE; color++){
+            //Don't check the color's own wire
+            if(color != wireColor){
+                int neighborCount = 0; //Will hold how many neighbors of a single color there are
+                //A wire Overlaps another if at any point, one of its cells has two neighbors of the same color wire
+                //If the cell has one neighbor but that colored neighbor is perpendicular to it, its also an overlap
+                if(xCoord + 1 < diagram.length && diagram[xCoord +1][yCoord] == color){
+                    neighborCount ++;
+                    if(xCoord +2 < diagram.length && diagram[xCoord +2][yCoord] == color ){
+                        return color;
+                    }
+                }
+                if(xCoord - 1 > -1 && diagram[xCoord -1][yCoord] == color){
+                    neighborCount ++;
+                    if(xCoord - 2 > -1 && diagram[xCoord -2][yCoord] == color){
+                        return color;
+                    }
+                }
+                if(yCoord + 1 < diagram.length && diagram[xCoord][yCoord +1] == color){
+                    neighborCount ++;
+                    if(yCoord + 2 < diagram.length && diagram[xCoord][yCoord +2] == color){
+                        return color;
+                    }
+                }
+                if(yCoord - 1 > -1 && diagram[xCoord][yCoord  -1] == color){
+                    neighborCount ++;
+                    if(yCoord - 2 > -1 && diagram[xCoord][yCoord  -2] == color){
+                        return color;
+                    }
+                }
+
+                if(neighborCount == 2){
+                    return color;
+                }
+            }
+        }
+
+        return 0;  //Dosen't overlap, return 0
     }
 
     /**
@@ -244,8 +275,6 @@ public class TaskOneModel {
 
         while(iterations < NUM_ITERATIONS){
             
-            //System.out.println("Training Data Success Rate: " + testSuccessRate(diagramMap));
-            //System.out.println("Testing Data Success Rate: " + testSuccessRate(testingInputMap));
 
             List<Entry<Integer[], Integer>> randomEntries = getRandomEntriesFromMap(diagramMap, SGD_SAMPLE_SIZE); //Select random entries in the input sample space
             
@@ -275,8 +304,8 @@ public class TaskOneModel {
 
             
 
-            //trainingLossList.add(calculateLoss(diagramMap));
-            //testingLossList.add(calculateLoss(testingInputMap));
+            trainingLossList.add(calculateLoss(diagramMap));
+            testingLossList.add(calculateLoss(testingInputMap));
 
             trainingAccuracy.add(testSuccessRate(diagramMap));
             testingAccuracy.add(testSuccessRate(testingInputMap));
@@ -308,7 +337,7 @@ public class TaskOneModel {
         }
         l2RegressionFactor *= lambda;
 
-        return ((totalLoss + l2RegressionFactor)/inputMap.size()) ;
+        return ((totalLoss)/inputMap.size()) + l2RegressionFactor ;
     }
 
     /**
@@ -331,18 +360,6 @@ public class TaskOneModel {
         return lossGradient;
     }
 
-
-    /**
-     * Tests the model's prediction of a random input from the testing data
-     * @return true if the model correctly predicted the input's actual lable, false otherwise
-     */
-    public boolean testPrediction(){
-
-        List<Entry<Integer[], Integer>> randomEntry = getRandomEntriesFromMap(diagramMap, 1); //Select a random input
-
-        return(predictLabel(randomEntry.get(0).getKey()) == randomEntry.get(0).getValue());
-
-    }
 
     /**
      * Predicts the label of a given input based on the calculated weights
@@ -368,7 +385,7 @@ public class TaskOneModel {
      * @param weightVector The weight vector (array of doubles).
      * @return The result of the sigmoid function.
      */
-public static double calculateSigmoid(Integer[] inputVector, double[] weightVector) {
+    public static double calculateSigmoid(Integer[] inputVector, double[] weightVector) {
         if (inputVector.length != weightVector.length) {
             System.out.println("Input vector and weight vector must have the same length.");
             return -1;
@@ -402,6 +419,13 @@ public static double calculateSigmoid(Integer[] inputVector, double[] weightVect
     }
 
 
+
+    /**
+     * Returns a list of random entries from the given map
+     * @param map The map being looked at
+     * @param count Number of entries to return
+     * @return a list of random entries from the given map
+     */
     public static List<Map.Entry<Integer[], Integer>> getRandomEntriesFromMap(Map<Integer[], Integer> map, int count) {
         // Convert the key set to a list
         List<Map.Entry<Integer[], Integer>> entryList = new ArrayList<>(map.entrySet());
@@ -438,6 +462,11 @@ public static double calculateSigmoid(Integer[] inputVector, double[] weightVect
     }
 
 
+    /**
+     * Test the success rate of model by comparing its predicted labels to the actual labels in a map
+     * @param map Data set looked overr
+     * @return The averrage success rate over the map
+     */
     private double testSuccessRate(HashMap<Integer[], Integer> map){
         int[] predictions = new int[map.size()];
 
@@ -460,15 +489,11 @@ public static double calculateSigmoid(Integer[] inputVector, double[] weightVect
     
     public static void main(String[] args) {
 
-        TaskOneModel taskOneModel = new TaskOneModel(2000, 0.01, 0.1);
+        TaskOneModel taskOneModel = new TaskOneModel(3000, 0.05, 0.1);
         taskOneModel.readTrainingDiagrams();
 
         taskOneModel.SGD();
 
-        System.out.println(taskOneModel.testPrediction());
-        System.out.println(taskOneModel.testPrediction());
-        System.out.println(taskOneModel.testPrediction());
-        System.out.println(taskOneModel.testPrediction());
 
     }
 

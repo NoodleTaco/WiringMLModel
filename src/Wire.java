@@ -45,6 +45,36 @@ public class Wire {
         }
     }
 
+    /**
+     * Encode the Wire Color to a 4 length array 
+     * @param label Numerical representation of the wire color
+     * @return Array representation of the wire color
+     */
+    public static int[] encodeWireColor(int label){
+        
+        if(label == Wire.RED_WIRE){
+            int[] encodedLabel = {1, 0, 0, 0}; 
+            return encodedLabel;
+        }
+        else if(label == Wire.BLUE_WIRE){
+            int[] encodedLabel = {0, 1, 0, 0}; 
+            return encodedLabel;
+        }
+        else if(label == Wire.YELLOW_WIRE){
+            int[] encodedLabel = {0, 0, 1, 0}; 
+            return encodedLabel;
+        }
+        else if(label == Wire.GREEN_WIRE){
+            int[] encodedLabel = {0, 0, 0, 1}; 
+            return encodedLabel;
+        }
+        else{
+            int[] encodedLabel = {0, 0, 0, 0}; 
+            return encodedLabel;
+        }
+
+    }
+
     public static void main(String[] args) {
         Wire redWire = new Wire();
         redWire.setWireColor(Wire.RED_WIRE);

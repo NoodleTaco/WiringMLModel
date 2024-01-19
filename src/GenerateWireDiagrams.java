@@ -9,6 +9,8 @@ public class GenerateWireDiagrams {
     public static final String taskTwoTrainingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\WireCutTrainingData.txt";
     public static final String taskTwoTestingData = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\WireCutTestingData.txt";
 
+    public static final String taskOneExtraPath = "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\ExtraCreditData\\TaskOneTesting.txt";
+
     public GenerateWireDiagrams(){
     }
 
@@ -101,7 +103,7 @@ public class GenerateWireDiagrams {
     public static void main (String [] args){
 
         GenerateWireDiagrams generateWireDiagrams = new GenerateWireDiagrams();
-        generateWireDiagrams.generateWireToCutWiringData(1000, taskTwoTestingData);
+        generateWireDiagrams.generateSafeDangerousWiringData(1000, "C:\\Users\\nasus\\Desktop\\Intro to AI\\Project3\\data\\ExtraCreditData\\TaskOneTesting.txt");
     }
 
 
